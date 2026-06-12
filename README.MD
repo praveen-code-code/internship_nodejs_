@@ -3,8 +3,6 @@
 ## Step 1: Create Project
 
 ```bash
-mkdir express-app
-cd express-app
 npm init -y
 ```
 
@@ -22,19 +20,7 @@ touch server.js
 touch model.js
 ```
 
-## Step 4: Add Code
 
-### server.js
-
-```javascript
-const express = require('express');
-const mongoose = require('mongoose');
-const UserData = require('./model');
-
-const app = express();
-
-app.listen(3000, () => console.log('server running.....okay'));
-```
 
 ## Step 5: Update package.json
 
