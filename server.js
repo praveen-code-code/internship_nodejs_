@@ -47,7 +47,25 @@ app.get('/get_all_data', async (req,res)=>{
     }
 })
 
+app.get('/get_data/:id', async (req,res)=>{
+    try{
+        const Data = await UserData.findById(req.params.id)
+        return res.json(Data)
+    }
+     catch(err){
+        console.log(err.message);
+    }
+})
 
+app.delete('/delete/:id', async (req,res)=>{
+    try{
+        await UserData.findByIdAndDelete(req.params.id);
+        return res.json({message: "user data deleted successfully"})
+    }
+     catch(err){
+        console.log(err.message);
+    }
+})
 
 
 app.listen(3000,()=>console.log('server running on http://127.0.0.1:3000.....'))
