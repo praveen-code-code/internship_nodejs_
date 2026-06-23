@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const UserData = require('./model');
+const User = require('./model');
+const bcrypt = require('bcrypt')
 
 const app = express();
 
@@ -10,62 +11,22 @@ mongoose.connect('mongodb+srv://loginsa80_db_user:eKOnSFD1e7DKyTLO@cluster0.iubw
     ()=> console.log('conneted to database......')
 ).catch(err => console.log(err))
 
-
-app.post('/add_user', async (req,res)=>{
-    const {username} = req.body;
-    const {email} = req.body;
+app.post('/signup', async (req,res)=>{
+    const {username}= req.body
+    const {email}= req.body
+    const {password}= req.body
     try{
-        const newData = new UserData({username,email});
-        await newData.save()
-        return res.json({message : "user data send successfully"})
+         //hash password
+         const salt = await bcrypt.genSalt(10);
+         const hashed_password =await bcrypt.hash(password,salt)
+
+         const newUser = new User({username,email,password:hashed_password})
+         await newUser.save()
+         return res.status(200).json("user signup successfully")
     }
     catch(err){
-        console.log(err.message);
+        console.log(err.message)
     }
-})
-
-app.put('/update/:id', async (req,res)=>{
-    const {username} = req.body;
-    const {email} = req.body;
-    try{
-        await UserData.findByIdAndUpdate(req.params.id,{username,email},{new:true});
-        return res.json({message: "user data updated successfully"})
-    }
-    catch(err){
-        console.log(err.message);
-    }
-});
-
-
-app.get('/get_all_data', async (req,res)=>{
-    try{
-        const allData = await UserData.find()
-        return res.json(allData)
-    }
-    catch(err){
-        console.log(err.message);
-    }
-})
-
-app.get('/get_data/:id', async (req,res)=>{
-    try{
-        const Data = await UserData.findById(req.params.id)
-        return res.json(Data)
-    }
-     catch(err){
-        console.log(err.message);
-    }
-})
-
-app.delete('/delete/:id', async (req,res)=>{
-    try{
-        await UserData.findByIdAndDelete(req.params.id);
-        return res.json({message: "user data deleted successfully"})
-    }
-     catch(err){
-        console.log(err.message);
-    }
-})
-
+} )
 
 app.listen(3000,()=>console.log('server running on http://127.0.0.1:3000.....'))
