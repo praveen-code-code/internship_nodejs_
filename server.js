@@ -7,20 +7,20 @@ const app = express();
 
 app.use(express.json());
 
-mongoose.connect('').then(
+mongoose.connect('mongodb+srv://loginsa80_db_user:eKOnSFD1e7DKyTLO@cluster0.iubw3xb.mongodb.net/').then(
     ()=> console.log('conneted to database......')
 ).catch(err => console.log(err))
 
 app.post('/signup', async (req,res)=>{
     const {username}= req.body
     const {email}= req.body
-    const {password}= req.body
+    const {password}= req.body  /* praveen123*/
     try{
          //hash password
          const salt = await bcrypt.genSalt(10);
          const hashed_password =await bcrypt.hash(password,salt)
 
-         const newUser = new User({username,email,password:hashed_password})
+         const newUser = new User({username,email,password:hashed_password})//ssw$ffjnjf $5455$$$Ffensddnc
          await newUser.save()
          return res.status(200).json("user signup successfully")
     }
@@ -28,5 +28,42 @@ app.post('/signup', async (req,res)=>{
         console.log(err.message)
     }
 } )
+
+app.post("/login", async (req,res)=>{
+    const {email}= req.body
+    const {password}= req.body 
+    try{
+        
+        const findUser =  await User.findOne({email});
+        await bcrypt.compare(password,findUser.password)
+        return res.json({
+            message: "login successful",
+            user:{
+                id:findUser._id,
+                username:findUser.username,
+                email:findUser.email,
+                password :findUser.password
+            }
+        })
+    }
+    catch(err){
+        console.log(err.message)
+    }
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 app.listen(3000,()=>console.log('server running on http://127.0.0.1:3000.....'))
