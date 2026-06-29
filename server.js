@@ -33,16 +33,24 @@ app.post("/login", async (req,res)=>{
     const {email}= req.body
     const {password}= req.body 
     try{
-        
+        if (!email || !password){
+            return res.json({message:"Email And password are reqired"});
+            }
         const findUser =  await User.findOne({email});
-        await bcrypt.compare(password,findUser.password)
+          if(!findUser){
+            return res.json({message:"user not found"});
+            
+          }
+        const isMatch=await bcrypt.compare(password,findUser.password)
+        if(!isMatch){
+            return res.json({message:"invalid password"});
+        }
         return res.json({
             message: "login successful",
             user:{
                 id:findUser._id,
                 username:findUser.username,
-                email:findUser.email,
-                password :findUser.password
+                email:findUser.email
             }
         })
     }
