@@ -1,7 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const User = require('./model');
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 const app = express();
 
@@ -16,13 +17,26 @@ app.post('/signup', async (req,res)=>{
     const {email}= req.body
     const {password}= req.body  /* praveen123*/
     try{
+         if (!email || !password || !username){
+            return res.json({message:"Email And password  or username are reqired"});
+            }
          //hash password
          const salt = await bcrypt.genSalt(10);
          const hashed_password =await bcrypt.hash(password,salt)
 
          const newUser = new User({username,email,password:hashed_password})//ssw$ffjnjf $5455$$$Ffensddnc
-         await newUser.save()
-         return res.status(200).json("user signup successfully")
+         await newUser.save();
+         const token = jwt.sign({id:newUser._id },'this is my secret key',{expiresIn:'1h'});
+         return res.status(200).json({
+            message:"user signup successfully",
+            token,
+            user:{
+                id:newUser._id,
+                username:newUser.username,
+                email:newUser.email
+            }
+        
+        })
     }
     catch(err){
         console.log(err.message)
@@ -45,6 +59,7 @@ app.post("/login", async (req,res)=>{
         if(!isMatch){
             return res.json({message:"invalid password"});
         }
+        
         return res.json({
             message: "login successful",
             user:{
